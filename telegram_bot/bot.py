@@ -344,7 +344,7 @@ async def get_subject(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return CONFIRM
 
 # Update main() to use webhooks when deployed
-def main():
+async def main():
     token = TELEGRAM_TOKEN
     if not token:
         raise RuntimeError("Set TELEGRAM_TOKEN in .env")
@@ -385,7 +385,7 @@ def main():
     else:
         # Use polling for local development
         print("🤖 Telegram bot running in polling mode... /start")
-        app.run_polling()
+        await app.run_polling()
         
     return app
 

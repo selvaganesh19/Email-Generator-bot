@@ -1,18 +1,20 @@
-# main.py (create this in your project root)
-import threading
+import asyncio
 import uvicorn
 
-def run_api():
-    uvicorn.run("api.app:app", host="0.0.0.0", port=8000)
+async def run_api():
+    config = uvicorn.Config("api.app:app", host="0.0.0.0", port=8000, loop="asyncio")
+    server = uvicorn.Server(config)
+    await server.serve()
 
-def run_bot():
-    import telegram_bot.bot
-    telegram_bot.bot.main()
+async def run_bot():
+    from telegram_bot.bot import main as bot_main
+    await bot_main()  # Make sure your bot.main() is async
+
+async def main():
+    await asyncio.gather(
+        run_api(),
+        run_bot()
+    )
 
 if __name__ == "__main__":
-    t1 = threading.Thread(target=run_api)
-    t2 = threading.Thread(target=run_bot)
-    t1.start()
-    t2.start()
-    t1.join()
-    t2.join()
+    asyncio.run(main())
