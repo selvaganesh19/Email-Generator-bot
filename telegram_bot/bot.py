@@ -1,6 +1,8 @@
 import os, sys
 from pathlib import Path
 
+from flask import app
+
 # Get the project root directory (one level up from current directory)
 ROOT_DIR = Path(__file__).resolve().parent.parent
 ENV_PATH = os.path.join(ROOT_DIR, '.env')
@@ -378,14 +380,8 @@ async def main():
     )
     app.add_handler(conv)
     
-    # Use webhook in production, polling in development
-    if is_production:
-        # Set up webhook mode (handled by FastAPI)
-        print("🤖 Telegram bot running in webhook mode...")
-    else:
-        # Use polling for local development
-        print("🤖 Telegram bot running in polling mode... /start")
-        await app.run_polling()
+    print("🤖 Telegram bot running in polling mode... /start")
+    await app.run_polling()
         
     return app
 
