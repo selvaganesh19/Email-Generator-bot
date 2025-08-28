@@ -11,9 +11,28 @@ os.environ.setdefault("TZ", "UTC")
 # More robust timezone patch
 try:
     import pytz
-    print("pytz imported", flush=True)
-except Exception as e:
-    print("pytz import error:", e, flush=True)
+    import importlib
+    
+    # Patch tzlocal
+    try:
+        import tzlocal
+        tzlocal.get_localzone = lambda: pytz.timezone("UTC")
+    except ImportError:
+        pass
+    
+    # Direct patch for apscheduler.util.astimezone
+    try:
+        import apscheduler.util
+        original_astimezone = getattr(apscheduler.util, "astimezone", None)
+        def patched_astimezone(tz):
+            if tz is None:
+                return pytz.UTC
+            return tz
+        apscheduler.util.astimezone = patched_astimezone
+    except (ImportError, AttributeError):
+        pass
+except ImportError:
+    pass
 
 import io, mimetypes, requests
 import telegram
@@ -27,7 +46,7 @@ from fastapi import FastAPI, Request
 
 # Load environment variables from the root .env file
 load_dotenv(ENV_PATH)
-print("Loaded .env", flush=True)
+print(f"Loading .env from: {ENV_PATH}")
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 API_BASE = os.getenv("API_BASE")  # e.g., https://<username>-email-api.hf.space
@@ -325,7 +344,7 @@ async def get_subject(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return CONFIRM
 
 # Update main() to use webhooks when deployed
-async def main():
+def main():
     token = TELEGRAM_TOKEN
     if not token:
         raise RuntimeError("Set TELEGRAM_TOKEN in .env")
@@ -359,22 +378,16 @@ async def main():
     )
     app.add_handler(conv)
     
-    print("🤖 Telegram bot running in polling mode... /start")
-    await app.run_polling()
+    # Use webhook in production, polling in development
+    if is_production:
+        # Set up webhook mode (handled by FastAPI)
+        print("🤖 Telegram bot running in webhook mode...")
+    else:
+        # Use polling for local development
+        print("🤖 Telegram bot running in polling mode... /start")
+        app.run_polling()
         
     return app
 
 if __name__ == "__main__":
-    import asyncio
-    try:
-        asyncio.run(main())
-    except Exception as e:
-        print("BOT STARTUP ERROR:", e, flush=True)
-        import sys
-        sys.exit(1)
-
-import sys
-sys.stderr = sys.stdout
-print("BOT STARTUP: Beginning execution", flush=True)
-print("TELEGRAM_TOKEN:", TELEGRAM_TOKEN, flush=True)
-print("API_BASE:", API_BASE, flush=True)
+    main()
