@@ -14,4 +14,4 @@ ENV PRODUCTION=True
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "uvicorn api.app:app --host 0.0.0.0 --port 8000 & python telegram_bot/bot.py"]
+CMD ["sh", "-c", "uvicorn api.app:app --host 0.0.0.0 --port 8000 & python telegram-bot/bot.py"]
