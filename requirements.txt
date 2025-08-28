@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+python-telegram-bot
+python-dotenv
+requests
+python-multipart
+pytz
