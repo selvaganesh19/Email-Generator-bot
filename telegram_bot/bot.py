@@ -11,28 +11,9 @@ os.environ.setdefault("TZ", "UTC")
 # More robust timezone patch
 try:
     import pytz
-    import importlib
-    
-    # Patch tzlocal
-    try:
-        import tzlocal
-        tzlocal.get_localzone = lambda: pytz.timezone("UTC")
-    except ImportError:
-        pass
-    
-    # Direct patch for apscheduler.util.astimezone
-    try:
-        import apscheduler.util
-        original_astimezone = getattr(apscheduler.util, "astimezone", None)
-        def patched_astimezone(tz):
-            if tz is None:
-                return pytz.UTC
-            return tz
-        apscheduler.util.astimezone = patched_astimezone
-    except (ImportError, AttributeError):
-        pass
-except ImportError:
-    pass
+    print("pytz imported", flush=True)
+except Exception as e:
+    print("pytz import error:", e, flush=True)
 
 import io, mimetypes, requests
 import telegram
@@ -46,7 +27,7 @@ from fastapi import FastAPI, Request
 
 # Load environment variables from the root .env file
 load_dotenv(ENV_PATH)
-print(f"Loading .env from: {ENV_PATH}")
+print("Loaded .env", flush=True)
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 API_BASE = os.getenv("API_BASE")  # e.g., https://<username>-email-api.hf.space
