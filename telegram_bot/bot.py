@@ -393,3 +393,6 @@ if __name__ == "__main__":
         print("BOT STARTUP ERROR:", e, flush=True)
         import sys
         sys.exit(1)
+
+import sys
+sys.stderr = sys.stdout
