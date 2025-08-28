@@ -1,8 +1,6 @@
 import os, sys
 from pathlib import Path
 
-from flask import app
-
 # Get the project root directory (one level up from current directory)
 ROOT_DIR = Path(__file__).resolve().parent.parent
 ENV_PATH = os.path.join(ROOT_DIR, '.env')
@@ -396,3 +394,6 @@ if __name__ == "__main__":
 
 import sys
 sys.stderr = sys.stdout
+print("BOT STARTUP: Beginning execution", flush=True)
+print("TELEGRAM_TOKEN:", TELEGRAM_TOKEN, flush=True)
+print("API_BASE:", API_BASE, flush=True)
