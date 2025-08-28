@@ -49,7 +49,7 @@ load_dotenv(ENV_PATH)
 print(f"Loading .env from: {ENV_PATH}")
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
-HF_API_BASE = os.getenv("HF_API_BASE")  # e.g., https://<username>-email-api.hf.space
+API_BASE = os.getenv("API_BASE")  # e.g., https://<username>-email-api.hf.space
 
 # Add these missing state definitions at the top with your other states
 ROLE, TONE, TOPIC, SUBJECT, NAME, POSITION, RECIPIENT_NAME, RECIPIENT, ATTACH_OR_SEND, WAIT_ATTACHMENTS, CONFIRM = range(11)
@@ -277,7 +277,7 @@ async def _send_now(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     try:
         await update.message.reply_text("📤 Sending email...")
-        r = requests.post(f"{HF_API_BASE}/send-email", data=data, files=files if files else None, timeout=60)
+        r = requests.post(f"{API_BASE}/send-email", data=data, files=files if files else None, timeout=60)
         resp = r.json()
         if r.ok:
             await update.message.reply_text(f"✅ Email sent to {resp.get('to', data['recipient'])} successfully!")
@@ -318,7 +318,7 @@ async def generate_email_from_api(context):
     }
     
     try:
-        r = requests.post(f"{HF_API_BASE}/generate-email", data=data, timeout=30)
+        r = requests.post(f"{API_BASE}/generate-email", data=data, timeout=30)
         r.raise_for_status()
         resp = r.json()
         return resp.get("email", ""), resp.get("subject", "")
@@ -391,4 +391,9 @@ async def main():
 
 if __name__ == "__main__":
     import asyncio
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except Exception as e:
+        print("BOT STARTUP ERROR:", e, flush=True)
+        import sys
+        sys.exit(1)
