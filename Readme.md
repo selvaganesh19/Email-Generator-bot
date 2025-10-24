@@ -27,7 +27,7 @@ Welcome to **Email-Generator-bot**! This project provides a robust backend and T
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/Email-Generator-bot.git
+git clone https://github.com/selvaganesh19/Email-Generator-bot.git
 cd Email-Generator-bot
 ```
 
